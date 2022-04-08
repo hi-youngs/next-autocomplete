@@ -22,7 +22,7 @@ const SearchBarTest = () => {
     } catch (err) {
       console.log(err.message);
     }
-    setState({ results: data.data.dataList.keyword });
+    setState({ results: data.data.dataList});
   }
 };
 
