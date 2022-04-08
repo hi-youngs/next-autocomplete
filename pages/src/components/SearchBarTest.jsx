@@ -8,7 +8,10 @@ const SearchBarTest = () => {
     if (text == "") return setState({ results: [] });
 
     let stockData, data;
-    if(text.length < 7){
+    if(text.length > 1){
+      if(text.length > 7){
+        text = text.substring(0,7)
+      }
     try {
         stockData = await fetch(
           `http://192.168.1.35:3003/autoComplete?keyword=${text}&limit=${7}`
@@ -19,7 +22,7 @@ const SearchBarTest = () => {
     } catch (err) {
       console.log(err.message);
     }
-    setState({ results: data.data.dataList });
+    setState({ results: data.data.dataList.keyword });
   }
 };
 

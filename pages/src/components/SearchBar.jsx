@@ -12,11 +12,49 @@ const SearchBar = ({ results, updateField }) => {
     setSearchText(text);
   };
 
-  const cancelSearch = () => {
-    setSearchText("");
+  const cancelSearch = async () => {
+    let stockData
+    
+    try {
+       await fetch(
+        `http://192.168.1.35:3003/autoComplete/keyword`
+        // `http://ws.audioscrobbler.com/2.0/?method=track.search&track=${text}&api_key=1a06b90e77951968492738173545a78c&format=json`
+      , {
+        method:"POST",
+        headers:{
+          "Content-Type" :"application/json",
+        },
+        body : JSON.stringify({
+          category:"기타",
+          keyword : searchText
+        })
+      });
+  } catch (err) {
+    console.log(err.message);
+  }
   };
 
-  const renderResults = (results).map(({ position, name, age }, index) => {
+  const onClickSearchResult = async(name) => {
+    updateText(name)
+    try {
+      await fetch(
+        `http://192.168.1.35:3003/autoComplete/searchCount`
+        // `http://ws.audioscrobbler.com/2.0/?method=track.search&track=${text}&api_key=1a06b90e77951968492738173545a78c&format=json`
+      , {
+        method:"PUT",
+        headers:{
+          "Content-Type" :"application/json",
+        },
+        body : JSON.stringify({
+          keyword : searchText
+        })
+      });
+  } catch (err) {
+    console.log(err.message);
+  }
+  }
+
+  const renderResults = results.map(({ position, keyword, age }, index) => {
     if (index < 7) {
       return (
         <SearchPreview
@@ -24,10 +62,11 @@ const SearchBar = ({ results, updateField }) => {
           updateText={updateText}
           index={index}
           position={position}
-          name={name}
+          name={keyword}
           age={age}
           keyword={searchText}
           activeIndex={activeIndex}
+          onClickSearchResult={onClickSearchResult}
         />
       );
     }
@@ -71,6 +110,10 @@ const SearchBar = ({ results, updateField }) => {
     if (e.code === "Backspace") {
       setActiveIndex(-1);
     }
+    if(e.code =="Enter"){
+      console.log("@@@@@함수가 왜 실행이 안되는거임", cancelSearch)
+      cancelSearch()
+    }
   };
 
   const searchInputOnBlur = () => {
@@ -79,6 +122,7 @@ const SearchBar = ({ results, updateField }) => {
   const searchInputOnFocus = () => {
     setSearchInputFocus(true);
   };
+
 
   return (
     <div className="auto">
@@ -100,7 +144,7 @@ const SearchBar = ({ results, updateField }) => {
           if(e.code !== "ArrowDown" && e.code !== "ArrowUp"){
             updateField(e.target.value);
           }
-        }, 500)}
+        }, 700)}
         autoComplete="off"
         className="search-bar"
         placeholder="Search"
@@ -114,7 +158,7 @@ const SearchBar = ({ results, updateField }) => {
         <>
           <div className="search-box-shadow">
             <div className="search-results">{renderResults}</div>
-            {/* <div className="close-search-box-button">닫기<img className="close-img" src={closeIcon}/></div> */}
+            <div className="close-search-box-button" onClick={()=> searchInputOnBlur()}>닫기<img className="close-img" src="/images/closs.png"/></div>
           </div>
         </>
       ) : null}
@@ -130,11 +174,12 @@ const SearchPreview = ({
   updateText,
   keyword,
   activeIndex,
+  onClickSearchResult
 }) => {
   console.log("@@@@@@", index,"@@@@actvieIndex", activeIndex)
   return (
     <div
-      onClick={() => updateText(name)}
+      onClick={() => onClickSearchResult(name)}
       className={`search-preview ${index === 0 ? "start" : ""} ${activeIndex === index ? "active-index" : ""}`}
       style={{ cursor: "pointer" }}
     >
