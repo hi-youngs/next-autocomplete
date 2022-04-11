@@ -85,11 +85,12 @@ const SearchBar = ({ results }) => {
             e.preventDefault();
 
             let activeIndexNum;
-            if (activeIndex < 6) {
+            if (activeIndex < state.results.length - 1) {
                 activeIndexNum = activeIndex + 1;
-            } else activeIndexNum = 6;
+                console.log("@@@@@@@@@@왜 하나 건너뛰지", activeIndexNum);
+            } else activeIndexNum = state.results.length - 1;
             setActiveIndex(activeIndexNum);
-            state.results.map(({ position, name, age }, index) => (index === activeIndexNum ? console.log("@@@@index 실행", setSearchText(name)) : "    과연  ??  "));
+            // state.results.map(({ position, name, age }, index) => (index === activeIndexNum ? console.log("@@@@index 실행", setSearchText(name)) : "    과연  ??  "));
         }
         if (e.code === "ArrowUp") {
             console.log("위키");
@@ -100,7 +101,7 @@ const SearchBar = ({ results }) => {
             } else activeIndexNum = -1;
             setActiveIndex(activeIndexNum);
             console.log(activeIndexNum);
-            state.results.map(({ position, name, age }, index) => (index === activeIndexNum ? console.log("@@@@index 실행", setSearchText(name)) : "    과연  ??  "));
+            // state.results.map(({ position, name, age }, index) => (index === activeIndexNum ? console.log("@@@@index 실행", setSearchText(name)) : "    과연  ??  "));
         }
         if (e.code === "Backspace") {
             setActiveIndex(-1);
@@ -119,12 +120,6 @@ const SearchBar = ({ results }) => {
 
     return (
         <div className="auto">
-            {/* <button
-          onClick={() => onClickSearchButton()}
-          className={`cancel-btn ${keyword.length > 0 ? "active" : "inactive"}`}
-        >
-          x
-        </button> */}
             <button onClick={() => onClickSearchButton()} className={`cancel-btn active`}>
                 <img src="/images/ic_search.png" alt="" />
             </button>
@@ -165,13 +160,17 @@ const SearchBar = ({ results }) => {
 
 const SearchPreview = ({ age, name, position, index, updateText, keyword, activeIndex, onClickSearchResult }) => {
     console.log("@@@@@@", index, "@@@@actvieIndex", activeIndex);
+    const escapeRegExp = (str) => {
+        return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+    };
+
     return (
         <div onClick={() => onClickSearchResult(name)} className={`search-preview ${index === 0 ? "start" : ""} ${activeIndex === index ? "active-index" : ""}`} style={{ cursor: "pointer" }}>
             <div className={`first`}>
                 <p
                     className="name"
                     dangerouslySetInnerHTML={{
-                        __html: name.replace(new RegExp(keyword, "gi"), (match) => '<b style="color: #e8340c;">' + match + "</b>"),
+                        __html: name.replace(new RegExp(escapeRegExp(keyword), "gi"), (match) => '<b style="color: #e8340c;">' + match + "</b>"),
                     }}
                 ></p>
             </div>
