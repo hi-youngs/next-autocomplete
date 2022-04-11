@@ -52,25 +52,12 @@ const SearchBar = ({ results }) => {
     }, 300);
 
     const onClickSearchResult = async (name) => {
+        let data = {
+            keyword: name,
+        };
+
+        let result = await autoCompleteApi.putSearchCount(JSON.stringify(data));
         router.push({ pathname: "/search/SearchResult", query: { keyword: name } });
-        updateText(name);
-        try {
-            await fetch(
-                `http://192.168.1.35:3003/autoComplete/searchCount`,
-                // `http://ws.audioscrobbler.com/2.0/?method=track.search&track=${text}&api_key=1a06b90e77951968492738173545a78c&format=json`
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        keyword: searchText,
-                    }),
-                }
-            );
-        } catch (err) {
-            console.log(err.message);
-        }
     };
 
     const renderResults = state.results.map(({ position, keyword, age }, index) => {
