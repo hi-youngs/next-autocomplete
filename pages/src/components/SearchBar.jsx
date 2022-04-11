@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { debounce } from "lodash";
-import * as Hangul from "hangul-js";
 import AutoComplete from "../../api/autoComplete";
 import router from "next/router";
 
@@ -9,7 +8,13 @@ const SearchBar = ({ results }) => {
     const [searchText, setSearchText] = useState("");
     const [state, setState] = useState({ results: [] });
 
+    const searchInput = useRef();
+
     const autoCompleteApi = new AutoComplete();
+
+    useEffect(() => {
+        searchInput.current.focus();
+    });
 
     const [activeIndex, setActiveIndex] = useState(-1);
 
@@ -22,10 +27,7 @@ const SearchBar = ({ results }) => {
                 text = text.substring(0, 7);
             }
             try {
-                stockData = await fetch(
-                    `http://192.168.1.35:3003/autoComplete?keyword=${text}&limit=${7}`
-                    // `http://ws.audioscrobbler.com/2.0/?method=track.search&track=${text}&api_key=1a06b90e77951968492738173545a78c&format=json`
-                );
+                stockData = await fetch(`http://192.168.1.35:3003/autoComplete?keyword=${text}&limit=${7}`);
                 data = await stockData.json();
                 console.log(data.data.dataList);
             } catch (err) {
@@ -33,23 +35,24 @@ const SearchBar = ({ results }) => {
             }
             setState({ results: data.data.dataList });
         }
-    }, 2000);
+    }, 700);
 
     //renders our results using the SearchPreview component
     const updateText = (text) => {
         setSearchText(text);
     };
 
-    const cancelSearch = debounce(async () => {
+    const onClickSearchButton = debounce(async () => {
         let data = {
             category: "기타",
             keyword: searchText,
         };
         let result = await autoCompleteApi.postSearchText(JSON.stringify(data));
+        if (result) router.push({ pathname: "/search/SearchResult", query: { keyword: searchText } });
     }, 300);
 
     const onClickSearchResult = async (name) => {
-        router.push({ pathname: "/src/SearchResult", query: { keyword: searchText } });
+        router.push({ pathname: "/search/SearchResult", query: { keyword: name } });
         updateText(name);
         try {
             await fetch(
@@ -99,7 +102,6 @@ const SearchBar = ({ results }) => {
                 activeIndexNum = activeIndex + 1;
             } else activeIndexNum = 6;
             setActiveIndex(activeIndexNum);
-            console.log("왜 들엉오자마자 6임 개빡치네", activeIndex);
             state.results.map(({ position, name, age }, index) => (index === activeIndexNum ? console.log("@@@@index 실행", setSearchText(name)) : "    과연  ??  "));
         }
         if (e.code === "ArrowUp") {
@@ -117,8 +119,7 @@ const SearchBar = ({ results }) => {
             setActiveIndex(-1);
         }
         if (e.code == "Enter" || e.code === "NumpadEnter") {
-            console.log("@@@@@함수가 왜 실행이 안되는거임", cancelSearch);
-            cancelSearch();
+            onClickSearchButton();
         }
     };
 
@@ -132,12 +133,12 @@ const SearchBar = ({ results }) => {
     return (
         <div className="auto">
             {/* <button
-          onClick={() => cancelSearch()}
+          onClick={() => onClickSearchButton()}
           className={`cancel-btn ${keyword.length > 0 ? "active" : "inactive"}`}
         >
           x
         </button> */}
-            <button onClick={() => cancelSearch()} className={`cancel-btn active`}>
+            <button onClick={() => onClickSearchButton()} className={`cancel-btn active`}>
                 <img src="/images/ic_search.png" alt="" />
             </button>
             <input
@@ -150,6 +151,7 @@ const SearchBar = ({ results }) => {
                         onSearch(e.target.value);
                     }
                 }}
+                ref={searchInput}
                 autoComplete="off"
                 className="search-bar"
                 placeholder="Search"

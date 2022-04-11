@@ -6,7 +6,8 @@
   "extends": ["eslint:recommended", "next", "next/core-web-vitals", "plugin:prettier/recommended"],
   "parserOptions": {
       "ecmaFeatures": {
-          "jsx": true
+          "jsx": true,
+          "js" :true,
       },
       "ecmaVersion": 12,
       "sourceType": "module"
