@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "axios": "^0.26.1",
+    "hangul-js": "^0.2.6",
     "lodash": "^4.17.21",
     "next": "12.1.4",
     "react": "18.0.0",

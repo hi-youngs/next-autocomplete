@@ -1,3 +1,19 @@
 {
-  "extends": "next/core-web-vitals"
+  "env": {
+      "browser": true,
+      "es2021": true
+  },
+  "extends": ["eslint:recommended", "next", "next/core-web-vitals", "plugin:prettier/recommended"],
+  "parserOptions": {
+      "ecmaFeatures": {
+          "jsx": true
+      },
+      "ecmaVersion": 12,
+      "sourceType": "module"
+  },
+  "plugins": ["react"],
+  "rules": {
+      "no-console": "warn", // console 체크
+      "no-unused-vars": "warn" // 사용하지 않는 변수 체크
+  }
 }
