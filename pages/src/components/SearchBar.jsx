@@ -25,14 +25,14 @@ const SearchBar = ({ results }) => {
         if (text == "") return setState({ results: [] });
         let resultText = text.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "");
 
-        let stockData, data;
+        let fetchData, data;
         if (resultText.length > 1) {
             if (resultText.length > 7) {
                 resultText = resultText.substring(0, 7);
             }
             try {
-                stockData = await fetch(`http://192.168.1.35:3003/autoComplete?keyword=${resultText}&limit=${7}`);
-                data = await stockData.json();
+                fetchData = await fetch(`http://192.168.1.35:3003/autoComplete?keyword=${resultText}&limit=${7}`);
+                data = await fetchData.json();
                 console.log(data.data.dataList);
             } catch (err) {
                 console.log(err.message);
@@ -50,46 +50,43 @@ const SearchBar = ({ results }) => {
         if (result) router.push({ pathname: "/search/SearchResult", query: { keyword: searchText } });
     }, 300);
 
-    const onClickSearchResult = async (name) => {
+    const onClickSearchResult = async (resultKeyword) => {
         let data = {
-            keyword: name,
+            keyword: resultKeyword,
         };
 
         let result = await autoCompleteApi.putSearchCount(JSON.stringify(data));
-        router.push({ pathname: "/search/SearchResult", query: { keyword: name } });
+        router.push({ pathname: "/search/SearchResult", query: { keyword: resultKeyword } });
     };
 
-    const renderResults = state.results.map(({ position, keyword, age }, index) => {
+    const renderResults = state.results.map(({ keyword }, index) => {
         if (index < 7) {
-            return <SearchPreview key={index} index={index} position={position} name={keyword} age={age} keyword={searchText} activeindex={activeIndex} onClickSearchResult={onClickSearchResult} />;
+            return <SearchPreview key={index} index={index} resultKeyword={keyword} keyword={searchText} activeindex={activeIndex} onClickSearchResult={onClickSearchResult} />;
         }
     });
 
     const doByInputKeyDown = (e) => {
-        // console.log(e.code, e.target.value);
         if (e.code === "ArrowDown") {
-            console.log("아래키");
             e.preventDefault();
 
             let activeIndexNum;
             if (activeIndex < state.results.length - 1) {
                 activeIndexNum = activeIndex + 1;
-                console.log("@@@@@@@@@@왜 하나 건너뛰지", activeIndexNum);
             } else activeIndexNum = state.results.length - 1;
             setActiveIndex(activeIndexNum);
-            state.results.map(({ position, keyword, age }, index) => (index === activeIndexNum ? console.log("@@@@index 실행", onChangeSearchText(keyword)) : "    과연  ??  "));
+
+            state.results.map(({ keyword }, index) => index === activeIndexNum && onChangeSearchText(keyword));
         }
         if (e.code === "ArrowUp") {
-            console.log("위키");
             e.preventDefault();
+
             let activeIndexNum;
             if (activeIndex > -1) {
                 activeIndexNum = activeIndex - 1;
             } else activeIndexNum = -1;
             setActiveIndex(activeIndexNum);
-            console.log(activeIndexNum);
-            console.log("@@@@@state.results ", state.results);
-            state.results.map(({ position, keyword, age }, index) => (index === activeIndexNum ? onChangeSearchText(keyword) : ""));
+
+            state.results.map(({ keyword }, index) => index === activeIndexNum && onChangeSearchText(keyword));
         }
         if (e.code === "Backspace") {
             setActiveIndex(-1);
@@ -116,7 +113,6 @@ const SearchBar = ({ results }) => {
                 onFocus={searchInputOnFocus}
                 onKeyDown={(e) => doByInputKeyDown(e)}
                 onKeyUp={(e) => {
-                    // console.log(e.code)
                     if (e.code !== "ArrowDown" && e.code !== "ArrowUp") {
                         onSearch(e.target.value);
                     }
@@ -146,19 +142,18 @@ const SearchBar = ({ results }) => {
     );
 };
 
-const SearchPreview = ({ age, name, position, index, keyword, activeindex, onClickSearchResult }) => {
-    console.log("@@@@@@", index, "@@@@actvieIndex", activeindex);
+const SearchPreview = ({ resultKeyword, index, keyword, activeindex, onClickSearchResult }) => {
     const escapeRegExp = (str) => {
         return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
     };
 
     return (
-        <div onClick={() => onClickSearchResult(name)} className={`search-preview ${index === 0 ? "start" : ""} ${activeindex === index ? "active-index" : ""}`} style={{ cursor: "pointer" }}>
+        <div onClick={() => onClickSearchResult(resultKeyword)} className={`search-preview ${index === 0 ? "start" : ""} ${activeindex === index && "active-index"}`} style={{ cursor: "pointer" }}>
             <div className={`first`}>
                 <p
                     className="name"
                     dangerouslySetInnerHTML={{
-                        __html: name.replace(new RegExp(escapeRegExp(keyword), "gi"), (match) => '<b style="color: #e8340c;">' + match + "</b>"),
+                        __html: resultKeyword.replace(new RegExp(escapeRegExp(keyword), "gi"), (match) => '<b style="color: #e8340c;">' + match + "</b>"),
                     }}
                 ></p>
             </div>
