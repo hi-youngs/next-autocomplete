@@ -18,8 +18,13 @@ const SearchBar = ({ results }) => {
 
     const [activeIndex, setActiveIndex] = useState(-1);
 
+    const onChangeSearchText = (text) => {
+        setSearchText(text);
+    };
+
     const onSearch = debounce(async (text) => {
         if (text == "") return setState({ results: [] });
+        let text = text.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, " ");
 
         let stockData, data;
         if (text.length > 1) {
@@ -38,9 +43,9 @@ const SearchBar = ({ results }) => {
     }, 700);
 
     //renders our results using the SearchPreview component
-    const updateText = (text) => {
-        setSearchText(text);
-    };
+    // const updateText = (text) => {
+    //     onChangeSearchText(text);
+    // };
 
     const onClickSearchButton = debounce(async () => {
         let data = {
@@ -62,19 +67,7 @@ const SearchBar = ({ results }) => {
 
     const renderResults = state.results.map(({ position, keyword, age }, index) => {
         if (index < 7) {
-            return (
-                <SearchPreview
-                    key={index}
-                    updateText={updateText}
-                    index={index}
-                    position={position}
-                    name={keyword}
-                    age={age}
-                    keyword={searchText}
-                    activeIndex={activeIndex}
-                    onClickSearchResult={onClickSearchResult}
-                />
-            );
+            return <SearchPreview key={index} index={index} position={position} name={keyword} age={age} keyword={searchText} activeindex={activeIndex} onClickSearchResult={onClickSearchResult} />;
         }
     });
 
@@ -90,7 +83,7 @@ const SearchBar = ({ results }) => {
                 console.log("@@@@@@@@@@왜 하나 건너뛰지", activeIndexNum);
             } else activeIndexNum = state.results.length - 1;
             setActiveIndex(activeIndexNum);
-            // state.results.map(({ position, name, age }, index) => (index === activeIndexNum ? console.log("@@@@index 실행", setSearchText(name)) : "    과연  ??  "));
+            // state.results.map(({ position, name, age }, index) => (index === activeIndexNum ? console.log("@@@@index 실행", onChangeSearchText(name)) : "    과연  ??  "));
         }
         if (e.code === "ArrowUp") {
             console.log("위키");
@@ -101,7 +94,7 @@ const SearchBar = ({ results }) => {
             } else activeIndexNum = -1;
             setActiveIndex(activeIndexNum);
             console.log(activeIndexNum);
-            // state.results.map(({ position, name, age }, index) => (index === activeIndexNum ? console.log("@@@@index 실행", setSearchText(name)) : "    과연  ??  "));
+            // state.results.map(({ position, name, age }, index) => (index === activeIndexNum ? console.log("@@@@index 실행", onChangeSearchText(name)) : "    과연  ??  "));
         }
         if (e.code === "Backspace") {
             setActiveIndex(-1);
@@ -138,8 +131,8 @@ const SearchBar = ({ results }) => {
                 className="search-bar"
                 placeholder="Search"
                 value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                activeIndex={activeIndex}
+                onChange={(e) => onChangeSearchText(e.target.value)}
+                activeindex={activeIndex}
                 id="inputEl"
             />
 
@@ -158,14 +151,14 @@ const SearchBar = ({ results }) => {
     );
 };
 
-const SearchPreview = ({ age, name, position, index, updateText, keyword, activeIndex, onClickSearchResult }) => {
-    console.log("@@@@@@", index, "@@@@actvieIndex", activeIndex);
+const SearchPreview = ({ age, name, position, index, keyword, activeindex, onClickSearchResult }) => {
+    console.log("@@@@@@", index, "@@@@actvieIndex", activeindex);
     const escapeRegExp = (str) => {
         return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
     };
 
     return (
-        <div onClick={() => onClickSearchResult(name)} className={`search-preview ${index === 0 ? "start" : ""} ${activeIndex === index ? "active-index" : ""}`} style={{ cursor: "pointer" }}>
+        <div onClick={() => onClickSearchResult(name)} className={`search-preview ${index === 0 ? "start" : ""} ${activeindex === index ? "active-index" : ""}`} style={{ cursor: "pointer" }}>
             <div className={`first`}>
                 <p
                     className="name"
