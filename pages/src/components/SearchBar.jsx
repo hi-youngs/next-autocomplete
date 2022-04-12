@@ -7,6 +7,7 @@ const SearchBar = ({ results }) => {
     const [searchInputfocus, setSearchInputFocus] = useState(true);
     const [searchText, setSearchText] = useState("");
     const [state, setState] = useState({ results: [] });
+    const [activeIndex, setActiveIndex] = useState(-1);
 
     const searchInput = useRef();
 
@@ -16,23 +17,21 @@ const SearchBar = ({ results }) => {
         searchInput.current.focus();
     });
 
-    const [activeIndex, setActiveIndex] = useState(-1);
-
     const onChangeSearchText = (text) => {
         setSearchText(text);
     };
 
     const onSearch = debounce(async (text) => {
         if (text == "") return setState({ results: [] });
-        let text = text.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, " ");
+        let resultText = text.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, " ");
 
         let stockData, data;
-        if (text.length > 1) {
-            if (text.length > 7) {
-                text = text.substring(0, 7);
+        if (resultText.length > 1) {
+            if (resultText.length > 7) {
+                resultText = resultText.substring(0, 7);
             }
             try {
-                stockData = await fetch(`http://192.168.1.35:3003/autoComplete?keyword=${text}&limit=${7}`);
+                stockData = await fetch(`http://192.168.1.35:3003/autoComplete?keyword=${resultText}&limit=${7}`);
                 data = await stockData.json();
                 console.log(data.data.dataList);
             } catch (err) {
@@ -41,11 +40,6 @@ const SearchBar = ({ results }) => {
             setState({ results: data.data.dataList });
         }
     }, 700);
-
-    //renders our results using the SearchPreview component
-    // const updateText = (text) => {
-    //     onChangeSearchText(text);
-    // };
 
     const onClickSearchButton = debounce(async () => {
         let data = {
@@ -83,7 +77,7 @@ const SearchBar = ({ results }) => {
                 console.log("@@@@@@@@@@왜 하나 건너뛰지", activeIndexNum);
             } else activeIndexNum = state.results.length - 1;
             setActiveIndex(activeIndexNum);
-            // state.results.map(({ position, name, age }, index) => (index === activeIndexNum ? console.log("@@@@index 실행", onChangeSearchText(name)) : "    과연  ??  "));
+            state.results.map(({ position, keyword, age }, index) => (index === activeIndexNum ? console.log("@@@@index 실행", onChangeSearchText(keyword)) : "    과연  ??  "));
         }
         if (e.code === "ArrowUp") {
             console.log("위키");
@@ -94,7 +88,8 @@ const SearchBar = ({ results }) => {
             } else activeIndexNum = -1;
             setActiveIndex(activeIndexNum);
             console.log(activeIndexNum);
-            // state.results.map(({ position, name, age }, index) => (index === activeIndexNum ? console.log("@@@@index 실행", onChangeSearchText(name)) : "    과연  ??  "));
+            console.log("@@@@@state.results ", state.results);
+            state.results.map(({ position, keyword, age }, index) => (index === activeIndexNum ? onChangeSearchText(keyword) : ""));
         }
         if (e.code === "Backspace") {
             setActiveIndex(-1);
