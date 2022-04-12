@@ -59,10 +59,10 @@ const SearchBar = () => {
     };
 
     const doByInputKeyDown = (e) => {
-        if (e.code === "ArrowDown") {
+        let activeIndexNum;
+        if (e.key === "ArrowDown") {
             e.preventDefault();
 
-            let activeIndexNum;
             if (activeIndex < state.results.length - 1) {
                 activeIndexNum = activeIndex + 1;
             } else activeIndexNum = state.results.length - 1;
@@ -70,10 +70,9 @@ const SearchBar = () => {
 
             state.results.map(({ keyword }, index) => index === activeIndexNum && onChangeSearchText(keyword));
         }
-        if (e.code === "ArrowUp") {
+        if (e.key === "ArrowUp") {
             e.preventDefault();
 
-            let activeIndexNum;
             if (activeIndex > -1) {
                 activeIndexNum = activeIndex - 1;
             } else activeIndexNum = -1;
@@ -81,10 +80,10 @@ const SearchBar = () => {
 
             state.results.map(({ keyword }, index) => index === activeIndexNum && onChangeSearchText(keyword));
         }
-        if (e.code === "Backspace") {
+        if (e.key === "Backspace") {
             setActiveIndex(-1);
         }
-        if (e.code == "Enter" || e.code === "NumpadEnter") {
+        if (e.key == "Enter" || e.key === "NumpadEnter") {
             onClickSearchButton();
         }
     };
