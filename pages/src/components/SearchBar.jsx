@@ -105,7 +105,7 @@ const SearchBar = ({ results }) => {
 
     return (
         <div className="auto">
-            <button onClick={() => onClickSearchButton()} className={`cancel-btn active`}>
+            <button onClick={() => onClickSearchButton()} className={`search-btn active`}>
                 <img src="/images/ic_search.png" alt="" />
             </button>
             <input
