@@ -23,7 +23,7 @@ const SearchBar = ({ results }) => {
 
     const onSearch = debounce(async (text) => {
         if (text == "") return setState({ results: [] });
-        let resultText = text.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, " ");
+        let resultText = text.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "");
 
         let stockData, data;
         if (resultText.length > 1) {
