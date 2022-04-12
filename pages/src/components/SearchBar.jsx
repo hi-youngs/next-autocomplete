@@ -3,7 +3,7 @@ import { debounce } from "lodash";
 import AutoComplete from "../../api/autoComplete";
 import router from "next/router";
 
-const SearchBar = ({ results }) => {
+const SearchBar = () => {
     const [searchInputfocus, setSearchInputFocus] = useState(true);
     const [searchText, setSearchText] = useState("");
     const [state, setState] = useState({ results: [] });
@@ -23,15 +23,14 @@ const SearchBar = ({ results }) => {
 
     const onSearch = debounce(async (text) => {
         if (text == "") return setState({ results: [] });
-        let resultText = text.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "");
 
         let fetchData, data;
-        if (resultText.length > 1) {
-            if (resultText.length > 7) {
-                resultText = resultText.substring(0, 7);
+        if (text.length > 1) {
+            if (text.length > 7) {
+                text = text.substring(0, 7);
             }
             try {
-                fetchData = await fetch(`http://192.168.1.35:3003/autoComplete?keyword=${resultText}&limit=${7}`);
+                fetchData = await fetch(`http://192.168.1.35:3003/autoComplete?keyword=${text}&limit=${7}`);
                 data = await fetchData.json();
                 console.log(data.data.dataList);
             } catch (err) {
@@ -58,12 +57,6 @@ const SearchBar = ({ results }) => {
         let result = await autoCompleteApi.putSearchCount(JSON.stringify(data));
         router.push({ pathname: "/search/SearchResult", query: { keyword: resultKeyword } });
     };
-
-    const renderResults = state.results.map(({ keyword }, index) => {
-        if (index < 7) {
-            return <SearchPreview key={index} index={index} resultKeyword={keyword} keyword={searchText} activeindex={activeIndex} onClickSearchResult={onClickSearchResult} />;
-        }
-    });
 
     const doByInputKeyDown = (e) => {
         if (e.code === "ArrowDown") {
@@ -102,6 +95,12 @@ const SearchBar = ({ results }) => {
     const searchInputOnFocus = () => {
         setSearchInputFocus(true);
     };
+
+    const renderResults = state.results.map(({ keyword }, index) => {
+        if (index < 7) {
+            return <SearchPreview key={index} index={index} resultKeyword={keyword} keyword={searchText} activeindex={activeIndex} onClickSearchResult={onClickSearchResult} />;
+        }
+    });
 
     return (
         <div className="auto">
