@@ -129,7 +129,7 @@ const SearchBar = () => {
                 <img src="/images/ic_search.png" alt="" />
             </button>
             <input
-                // onBlur={searchInputOnBlur}
+                onBlur={searchInputOnBlur}
                 onFocus={searchInputOnFocus}
                 onKeyDown={(e) => doByInputKeyDown(e)}
                 onKeyUp={(e) => {
@@ -167,8 +167,12 @@ const SearchPreview = ({ resultKeyword, index, keyword, activeindex, onClickSear
         return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
     };
 
+    const handleMouseDown = (e) => {
+        e.preventDefault();
+    };
     return (
         <div
+            onMouseDown={handleMouseDown}
             onClick={() => {
                 onClickSearchResult(resultKeyword);
             }}
