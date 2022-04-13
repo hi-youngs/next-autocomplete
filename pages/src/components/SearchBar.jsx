@@ -16,7 +16,7 @@ const SearchBar = () => {
 
     useEffect(() => {
         searchInput.current.focus();
-    });
+    }, []);
 
     const onChangeSearchText = (text) => {
         setSearchText(text);
@@ -116,7 +116,7 @@ const SearchBar = () => {
     };
 
     const searchInputOnBlur = () => {
-        setSearchInputFocus(true);
+        setSearchInputFocus(false);
     };
     const searchInputOnFocus = () => {
         setSearchInputFocus(true);
@@ -134,7 +134,7 @@ const SearchBar = () => {
                 <img src="/images/ic_search.png" alt="" />
             </button>
             <input
-                onBlur={searchInputOnBlur}
+                // onBlur={searchInputOnBlur}
                 onFocus={searchInputOnFocus}
                 onKeyDown={(e) => doByInputKeyDown(e)}
                 onKeyUp={(e) => {
@@ -173,7 +173,13 @@ const SearchPreview = ({ resultKeyword, index, keyword, activeindex, onClickSear
     };
 
     return (
-        <div onClick={() => onClickSearchResult(resultKeyword)} className={`search-preview ${index === 0 ? "start" : ""} ${activeindex === index && "active-index"}`} style={{ cursor: "pointer" }}>
+        <div
+            onClick={() => {
+                onClickSearchResult(resultKeyword);
+            }}
+            className={`search-preview ${index === 0 ? "start" : ""} ${activeindex === index && "active-index"}`}
+            style={{ cursor: "pointer" }}
+        >
             <div className={`first`}>
                 <p
                     className="name"
