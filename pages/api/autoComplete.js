@@ -4,10 +4,10 @@ class AutoComplete extends Api {
 
 
     getOnSearch = async (param) => {
-
         try {
                 let data = await fetch(
-                    `${process.env.API_URL}autoComplete?keyword=${param}&limit=${7}`,
+                    `${process.env.API_URL}autoComplete?keyword=${param}&limit=${7}&category=기타`,
+                // `http://ws.audioscrobbler.com/2.0/?method=track.search&track=${text}&api_key=1a06b90e77951968492738173545a78c&format=json`
                     {
                         method: "GET",
                         headers: {
@@ -48,7 +48,6 @@ class AutoComplete extends Api {
             try {
                     let data = await fetch(
                         `${process.env.API_URL}autoComplete/searchCount`,
-                        // `http://ws.audioscrobbler.com/2.0/?method=track.search&track=${text}&api_key=1a06b90e77951968492738173545a78c&format=json`
                         {
                             method: "PUT",
                             headers: {
@@ -72,7 +71,6 @@ class AutoComplete extends Api {
             try {
                     let data = await fetch(
                         `${process.env.API_URL}autoComplete/satisfactionCount`,
-                        // `http://ws.audioscrobbler.com/2.0/?method=track.search&track=${text}&api_key=1a06b90e77951968492738173545a78c&format=json`
                         {
                             method: "PUT",
                             headers: {

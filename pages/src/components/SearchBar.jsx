@@ -30,13 +30,8 @@ const SearchBar = () => {
         let fetchData, data;
         if (resultText.length > 1) {
             console.log("resultText.length", resultText.length);
-            try {
-                fetchData = await fetch(`${process.env.API_URL}autoComplete?keyword=${resultText}&limit=${7}&category=기타`);
-                data = await fetchData.json();
-                console.log(data.data.dataList);
-            } catch (err) {
-                console.log(err.message);
-            }
+            fetchData = await autoCompleteApi.getOnSearch(resultText);
+            data = await fetchData.json();
             setState({ results: data.data.dataList });
         }
     }, 700);
