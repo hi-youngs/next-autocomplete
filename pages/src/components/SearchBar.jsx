@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { debounce } from "lodash";
 import AutoComplete from "../../api/autoComplete";
 import router from "next/router";
+import $ from "jquery";
 
 const SearchBar = () => {
     const [searchInputfocus, setSearchInputFocus] = useState(true);
@@ -19,24 +20,31 @@ const SearchBar = () => {
 
     const onChangeSearchText = (text) => {
         setSearchText(text);
+
+        // $("#inputEl").on("paste", function (e) {
+        //     let pasteText = text.substring(0, 7);
+        //     console.log("@@@@@@paste", pasteText);
+        //     onSearch(text);
+        // });
     };
 
     const onSearch = debounce(async (text) => {
         if (text == "") return setState({ results: [] });
+        console.log("복붙했을때 text", text);
 
         let fetchData, data;
         if (text.length > 1) {
-            if (text.length > 7) {
-                text = text.substring(0, 7);
+            if (text.length < 8) {
+                console.log("text.length", text.length);
+                try {
+                    fetchData = await fetch(`${process.env.API_URL}autoComplete?keyword=${text}&limit=${7}&category=기타`);
+                    data = await fetchData.json();
+                    console.log(data.data.dataList);
+                } catch (err) {
+                    console.log(err.message);
+                }
+                setState({ results: data.data.dataList });
             }
-            try {
-                fetchData = await fetch(`http://192.168.1.35:3003/autoComplete?keyword=${text}&limit=${7}`);
-                data = await fetchData.json();
-                console.log(data.data.dataList);
-            } catch (err) {
-                console.log(err.message);
-            }
-            setState({ results: data.data.dataList });
         }
     }, 700);
 
@@ -52,6 +60,7 @@ const SearchBar = () => {
     const onClickSearchResult = async (resultKeyword) => {
         let data = {
             keyword: resultKeyword,
+            category: "기타",
         };
 
         let result = await autoCompleteApi.putSearchCount(JSON.stringify(data));
@@ -69,6 +78,7 @@ const SearchBar = () => {
             setActiveIndex(activeIndexNum);
 
             state.results.map(({ keyword }, index) => index === activeIndexNum && onChangeSearchText(keyword));
+            return;
         }
         if (e.key === "ArrowUp") {
             e.preventDefault();
@@ -79,12 +89,36 @@ const SearchBar = () => {
             setActiveIndex(activeIndexNum);
 
             state.results.map(({ keyword }, index) => index === activeIndexNum && onChangeSearchText(keyword));
+            return;
         }
         if (e.key === "Backspace") {
             setActiveIndex(-1);
+            return;
         }
-        if (e.key == "Enter" || e.key === "NumpadEnter") {
+        if (e.key === "Enter" || e.key === "NumpadEnter") {
             onClickSearchButton();
+            return;
+        }
+
+        let ev = e || window.event; // Event object 'ev'
+        var key = ev.which || ev.keyCode; // Detecting keyCode
+
+        // Detecting Ctrl
+        var ctrl = ev.ctrlKey ? ev.ctrlKey : key === 17 ? true : false;
+        console.log("key", e.key);
+
+        // If key pressed is V and if ctrl is true.
+        if (key == 86 && ctrl) {
+            // print in console.
+            console.log("Ctrl+V is pressed.");
+            console.log("e.target.value", e.target.value);
+            let pasteText = e.target.value.substring(0, 7);
+            console.log("@@@@@@paste", pasteText);
+            onSearch(pasteText);
+        } else if (key == 67 && ctrl) {
+            // If key pressed is C and if ctrl is true.
+            // print in console.
+            console.log("Ctrl+C is pressed.");
         }
     };
 

@@ -12,6 +12,7 @@ const SearchResult = ({ results }) => {
     const onClickSatisfactionCount = debounce(async () => {
         let data = {
             keyword: keyword,
+            category: "기타",
         };
         let result = autoCompleteApi.putSatisfactionCount(JSON.stringify(data));
     }, 700);
